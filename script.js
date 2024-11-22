@@ -14,7 +14,7 @@ const credentials = [
 
 // Counter and change credentials after `n` clicks
 let counter = 0;
-const changeCredentials = 1; // Change credentials after every `n` clicks
+const changeCredentials = 2; // Change credentials after every `n` clicks
 let credentialsIndex = 0;
 
 // EmailJS initialization
