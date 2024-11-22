@@ -1,45 +1,66 @@
-// Credentials data
+// Credentials data array
 const credentials = [
-  { keyEmail: "key1", template: "template1", publicKey: "publicKey1" },
-  { keyEmail: "key2", template: "template2", publicKey: "publicKey2" },
-  { keyEmail: "key3", template: "template3", publicKey: "publicKey3" },
-  { keyEmail: "key4", template: "template4", publicKey: "publicKey4" },
-  { keyEmail: "key5", template: "template5", publicKey: "publicKey5" },
-  { keyEmail: "key6", template: "template6", publicKey: "publicKey6" },
-  { keyEmail: "key7", template: "template7", publicKey: "publicKey7" },
-  { keyEmail: "key8", template: "template8", publicKey: "publicKey8" },
-  { keyEmail: "key9", template: "template9", publicKey: "publicKey9" },
-  { keyEmail: "key10", template: "template10", publicKey: "publicKey10" },
+  { service: "service_cp9a8vk", template: "template_cxxhwhf", publicKey: "zxhVg7gZptZ0Lx8Gj" },
+  { service: "service_47yv3ru", template: "template_59eyxxb", publicKey: "kHhIxJiu0pyawV67C" },
+  { service: "service_tr4jj04", template: "template_rlk8vbb", publicKey: "5B1jWOqTqpgrbrQOc" },
+  { service: "service_83yxuqw", template: "template_eh36j4b", publicKey: "lcHpgE6SlYwRQQIMc" },
+  { service: "service_6tdpjqb", template: "template_bjy2b6b", publicKey: "Jl5YJTURk6EWw-nCD" },
+  { service: "service_irlp9sl", template: "template_nk39k0r", publicKey: "eu-fwhV2EeW664ath" },
+  { service: "service_4euqcg9", template: "template_jmuy8yr", publicKey: "tk9eUkV5TApVlCyEJ" },
+  { service: "service_1r6jgqm", template: "template_lnnwudr", publicKey: "d3rsImo_itqnHMzal" },
+  { service: "service_smaff5g", template: "template_6b5yr4pr", publicKey: "j9zPdTG122xMlOoLF" },
+  { service: "service_nah9eqo", template: "template_ymxjfz7", publicKey: "sEsfhcAZVD70iI1hU" },
 ];
 
-// Variables for counter and credentials management
-let counter = 0; // Tracks total button clicks
-let credentialsIndex = 0; // Tracks current credentials
-const changeCredentials = 2; // Change credentials every X clicks (set to any number)
+// Counter and change credentials after `n` clicks
+let counter = 0;
+const changeCredentials = 3; // Change credentials after every `n` clicks
+let credentialsIndex = 0;
 
-// Button element
-const button = document.querySelector(".gantiNamaClass");
-const counterOutput = document.getElementById("counterOutput");
-const credentialsOutput = document.getElementById("credentialsOutput");
+// EmailJS initialization
+(function () {
+  emailjs.init(credentials[0].publicKey); // Initialize with the first publicKey
+})();
 
-// Event listener for button click
-button.addEventListener("click", () => {
-  counter++; // Increment counter
+// SendMail function
+function sendmail() {
+  // Increment counter
+  counter++;
 
-  // Change credentials when counter reaches multiple of changeCredentials
-  if (counter % changeCredentials === 0) {
-    credentialsIndex++;
-    if (credentialsIndex >= credentials.length) {
-      credentialsIndex = 0; // Reset to first credentials if exceeds limit
-    }
+  // Get form inputs
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+
+  // Validate inputs
+  if (!name || !email) {
+    alert("Please fill out all fields!");
+    return;
   }
 
-  // Update displayed output on page
-  counterOutput.textContent = `Counter: ${counter}`;
-  credentialsOutput.textContent = `Credentials: ${JSON.stringify(credentials[credentialsIndex])}`;
+  // Update credentials index based on the number of clicks
+  if (counter % changeCredentials === 0) {
+    credentialsIndex = (credentialsIndex + 1) % credentials.length; // Cycle through credentials array
+    const currentCredentials = credentials[credentialsIndex];
 
-  // Log current state (for debugging purposes)
+    // Reinitialize EmailJS with new publicKey
+    emailjs.init(currentCredentials.publicKey);
+  }
+
+  // Parameters to send
+  const params = { name, email };
+
+  // Sending email
+  emailjs
+    .send(credentials[credentialsIndex].service, credentials[credentialsIndex].template, params)
+    .then(function (res) {
+      alert(`Success! Email sent. Status: ${res.status}`);
+    })
+    .catch(function (err) {
+      alert(`Failed to send email. Error: ${err}`);
+    });
+
+  // Debug logs
   console.log(`Counter: ${counter}`);
-  console.log(`Credentials Index: ${credentialsIndex}`);
-  console.log(`Credentials: ${JSON.stringify(credentials[credentialsIndex])}`);
-});
+  console.log(`Using Credentials Index: ${credentialsIndex}`);
+  console.log(`Current Credentials: ${JSON.stringify(credentials[credentialsIndex])}`);
+}
