@@ -20,21 +20,20 @@ const credentials = [
 
 // Inisialisasi variabel
 let currentIndex = 0; // Indeks awal kredensial
-let counter = 0; // Counter klik
-const changeCredentials = 1; // Ubah kredensial setelah setiap 1 klik
+const button = document.getElementById("submit-button"); // Ambil elemen tombol submit
 
 // Fungsi untuk mengirim email
-function sendmail() {
+function sendEmail() {
   const { service, template, publicKey } = credentials[currentIndex];
 
   // Ambil data form
-  const parms = {
+  const params = {
     name: document.getElementById("name").value,
     email: document.getElementById("email").value,
   };
 
   // Validasi input
-  if (!parms.name || !parms.email) {
+  if (!params.name || !params.email) {
     alert("Harap isi semua field!");
     return;
   }
@@ -43,26 +42,77 @@ function sendmail() {
   emailjs.init(publicKey);
 
   // Kirim email
-  emailjs
-    .send(service, template, parms)
+  emailjs.send(service, template, params)
     .then(() => {
-      alert("Email berhasil dikirim!");
-      updateCredentials(); // Panggil untuk ganti kredensial
+      button.value = `Berhasil mengirim menggunakan server ${currentIndex + 1}`;
+      console.log("Email berhasil dikirim!");
     })
     .catch((error) => {
       console.error("Error mengirim email:", error);
-      alert("Terjadi kesalahan saat mengirim email.");
+      button.value = `Gagal mengirim menggunakan server ${currentIndex + 1}`;
+      currentIndex++; // Coba kredensial berikutnya
+
+      if (currentIndex < credentials.length) {
+        button.value = `Loading... mencoba server ${currentIndex + 1}`;
+        setTimeout(sendEmail, 1000); // Tunggu sejenak sebelum mencoba lagi
+      } else {
+        alert("Semua server gagal. Silakan coba lagi nanti.");
+      }
     });
 }
 
-// Fungsi untuk update kredensial berdasarkan klik
-function updateCredentials() {
-  counter++;
+// Event listener untuk tombol submit
+button.addEventListener("click", () => {
+  currentIndex = 0; // Reset indeks kredensial saat tombol ditekan
+  button.value = `Loading... mencoba server ${currentIndex + 1}`; // Ubah teks tombol
+  sendEmail(); // Panggil fungsi untuk mengirim email
+});
 
-  if (counter >= changeCredentials) {
-    // Update kredensial
-    currentIndex = (currentIndex + 1) % credentials.length; // Rotate kredensial
-    console.log(`Switching to credentials ${currentIndex + 1}: ${JSON.stringify(credentials[currentIndex])}`);
-    counter = 0; // Reset counter
-  }
-}
+// // Inisialisasi variabel
+// let currentIndex = 0; // Indeks awal kredensial
+// let counter = 0; // Counter klik
+// const changeCredentials = 1; // Ubah kredensial setelah setiap 1 klik
+
+// // Fungsi untuk mengirim email
+// function sendmail() {
+//   const { service, template, publicKey } = credentials[currentIndex];
+
+//   // Ambil data form
+//   const parms = {
+//     name: document.getElementById("name").value,
+//     email: document.getElementById("email").value,
+//   };
+
+//   // Validasi input
+//   if (!parms.name || !parms.email) {
+//     alert("Harap isi semua field!");
+//     return;
+//   }
+
+//   // Update EmailJS publicKey sebelum mengirim
+//   emailjs.init(publicKey);
+
+//   // Kirim email
+//   emailjs
+//     .send(service, template, parms)
+//     .then(() => {
+//       alert("Email berhasil dikirim!");
+//       updateCredentials(); // Panggil untuk ganti kredensial
+//     })
+//     .catch((error) => {
+//       console.error("Error mengirim email:", error);
+//       alert("Terjadi kesalahan saat mengirim email.");
+//     });
+// }
+
+// // Fungsi untuk update kredensial berdasarkan klik
+// function updateCredentials() {
+//   counter++;
+
+//   if (counter >= changeCredentials) {
+//     // Update kredensial
+//     currentIndex = (currentIndex + 1) % credentials.length; // Rotate kredensial
+//     console.log(`Switching to credentials ${currentIndex + 1}: ${JSON.stringify(credentials[currentIndex])}`);
+//     counter = 0; // Reset counter
+//   }
+// }
